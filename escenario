@@ -1,0 +1,25 @@
+import pygame
+from config import*
+
+#FONDO NIVEL UNO
+lvl_uno_nubes_uno = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Uno\nubes.jpg"), (ANCHO, ALTO))
+lvl_uno_nubes_dos = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Uno\nubes.jpg"), (ANCHO, ALTO))
+lvl_uno_escenario = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Uno\Escenario.png"), (ANCHO, ALTO))
+lvl_uno_cadenas = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Uno\cadenas.png"), (ANCHO, ALTO))
+
+#FONDO NIVEL DOS
+lvl_dos_nubes_uno = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Dos\nubes.png"), (ANCHO, ALTO))
+lvl_dos_nubes_dos = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Dos\nubes.png"), (ANCHO, ALTO))
+lvl_dos_escenario = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Dos\Escenario.png"), (ANCHO, ALTO))
+lvl_dos_cadenas = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Dos\cadenas.png"), (ANCHO, ALTO))
+lvl_dos_plataforma_mv = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Dos\plataforma.png"), (222, 565))
+
+#FONDO NIVEL TRES
+lvl_tres_nubes_uno = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Tres\fondo.png"), (ANCHO, ALTO))
+lvl_tres_nubes_dos = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Tres\fondo.png"), (ANCHO, ALTO))
+lvl_tres_escenario = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Tres\escenario.png"), (ANCHO, ALTO))
+lvl_tres_plataforma_mv_uno = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Tres\plataformas.png"), (70, 10))
+lvl_tres_plataforma_mv_dos = pygame.transform.scale(pygame.image.load(r"Recursos\Escenario\Nivel Tres\plataformas.png"), (70, 10))
+
+
+
