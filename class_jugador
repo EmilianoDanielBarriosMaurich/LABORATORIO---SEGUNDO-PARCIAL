@@ -1,0 +1,174 @@
+from animaciones import*
+from funciones import*
+import pygame
+
+
+#CLASE JUGADOR
+class Jugador(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.animaciones = get_animations_player()
+        self.indice = 0
+        self.image = self.animaciones[self.indice]
+        self.rect = self.image.get_rect()
+        self.rect.x = 60
+        self.rect.y = 590
+        self.velocidad_x = 0
+        self.velocidad_y = 15
+        self.saltando = False
+        self.parado = False
+        self.derecha = True
+        self.disparo = False
+        self.golpe = False
+        self.vida = 20
+        self.puntaje = 0
+        self.municion = 20
+        self.contador_frames = 0
+        self.sonido_salto = pygame.mixer.Sound(r"Recursos\Sonidos\salto.mp3")
+        self.sonido_danio = pygame.mixer.Sound(r"Recursos\Sonidos\daño jugador.mp3")
+        
+    def update(self):
+        #MOVIMIENTO HORIZONTAL
+        self.rect.x += self.velocidad_x
+
+        #MOVIMIENTO VERTICAL
+        self.rect.y += self.velocidad_y
+        self.velocidad_y += 2
+ 
+        #COMPRUEBA LIMITES DE LA PANTALLA 
+        if self.rect.left < 0:
+            self.rect.left = 0
+        elif self.rect.right > ANCHO:
+            self.rect.right = ANCHO
+
+        #ACCIONES PARA LA DERECHA
+        if self.velocidad_x > 0:
+            self.derecha = True
+            #SALTO
+            if self.saltando and self.velocidad_y < 0:
+                self.indice = 12
+            elif self.saltando and self.velocidad_y >= 0:
+                self.indice = 14
+            #CAMINANDO
+            else:
+                self.contador_frames += 1
+                if self.contador_frames == 2:
+                    self.indice += 1
+                    self.contador_frames = 0
+                    if self.indice >= 8 or self.indice <= 3:
+                        self.indice = 4
+
+        #ACCIONES PARA LA IZQUIERDA
+        elif self.velocidad_x < 0:
+            self.derecha = False
+            #SALTO
+            if self.saltando and self.velocidad_y < 0:
+                self.indice = 13
+            elif self.saltando and self.velocidad_y >= 0:
+                self.indice = 15
+            #CAMINANDO
+            else:
+                self.contador_frames += 1
+                if self.contador_frames == 2:
+                    self.indice += 1
+                    self.contador_frames = 0
+                    if self.indice >= 12 or self.indice <= 7:
+                        self.indice = 8
+
+        #DISPARO 
+        elif self.velocidad_x == 0 and self.disparo and not self.saltando and self.municion >= 1:
+            if self.derecha:
+                self.indice += 1
+                if self.indice > 27 or self.indice < 24:
+                    self.indice = 24
+            else:
+                self.indice += 1
+                if  self.indice > 31 or self.indice < 28:
+                    self.indice = 28
+
+        elif self.velocidad_x == 0 and self.disparo and not self.saltando and self.municion == 0:
+            if self.derecha:
+                self.indice += 1
+                if self.indice > 26 or self.indice < 24:
+                    self.indice = 24
+            else:
+                self.indice += 1
+                if  self.indice > 30 or self.indice < 28:
+                    self.indice = 28
+
+
+        #ATAQUE CUERPO A CUERPO
+        elif self.velocidad_x == 0 and self.golpe and not self.saltando:
+            if self.derecha:
+                self.indice += 1
+                if self.indice > 19 or self.indice < 16:
+                    self.indice = 16
+            else:
+                self.indice += 1
+                if self.indice > 23 or self.indice < 20:
+                    self.indice = 20
+     
+        #REPOSO
+        elif self.velocidad_x == 0 and not self.saltando:
+            if self.derecha:
+                self.contador_frames += 1
+                if self.contador_frames == 2:
+                    self.indice += 1
+                    self.contador_frames = 0
+                    if self.indice > 1 or self.indice < 0:
+                        self.indice = 0
+            else:
+                self.contador_frames += 1
+                if self.contador_frames == 2:
+                    self.indice += 1
+                    self.contador_frames = 0
+                    if self.indice > 3 or self.indice < 2:
+                        self.indice = 2
+        elif self.velocidad_x == 0 and self.saltando:
+            if self.derecha:
+                if self.saltando and self.velocidad_y < 0:
+                    self.indice = 12
+                elif self.saltando and self.velocidad_y >= 0:
+                    self.indice = 14
+            else:
+                if self.saltando and self.velocidad_y < 0:
+                    self.indice = 13
+                elif self.saltando and self.velocidad_y >= 0:
+                    self.indice = 15
+
+        self.image = self.animaciones[self.indice]
+
+    def saltar(self):
+        if self.saltando == False and self.parado == True:
+            self.velocidad_y = -20
+            self.saltando = True
+            self.sonido_salto.play()
+
+    def detectar_plataforma(self, plataformas):
+        for plataforma in plataformas:
+            if crear_borde_inferior(self.rect).colliderect(plataforma):
+                self.rect.bottom = plataforma.top
+                self.saltando = False
+                self.parado = True
+                self.velocidad_y = 2
+            elif crear_borde_superior(self.rect).colliderect(plataforma):
+                self.rect.top = plataforma.bottom
+                self.rect.y += self.velocidad_y
+                self.velocidad_y += 2 
+            elif crear_borde_derecho(self.rect).colliderect(plataforma):
+                self.rect.right = plataforma.left - 1
+            elif crear_borde_izquierdo(self.rect).colliderect(plataforma):
+                self.rect.left = plataforma.right + 1
+            elif self.rect.colliderect(plataforma):
+                self.parado = False 
+
+    def detectar_enemigo(self, enemigo):
+        if crear_borde_derecho(self.rect).colliderect(enemigo):
+            self.vida -= 1
+            self.sonido_danio.play()
+        elif crear_borde_izquierdo(self.rect).colliderect(enemigo):
+            self.vida -= 1
+            self.sonido_danio.play()
+
+    
+
