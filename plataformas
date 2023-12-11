@@ -1,0 +1,71 @@
+import pygame
+from config import*
+from escenario import*
+
+
+#PLATAFORMAS NIVEL UNO
+
+cajas_uno_lvl_uno = pygame.Rect(285, 527, 334, 80)
+cajas_dos_lvl_uno = pygame.Rect(343, 447, 242, 80)
+cajas_tres_lvl_uno = pygame.Rect(408, 367, 163, 80)
+cajas_cuatro_lvl_uno = pygame.Rect(528, 287, 80, 80)
+cajas_cinco_lvl_uno = pygame.Rect(828, 287, 80, 80)
+cajas_seis_lvl_uno = pygame.Rect(942, 527, 334, 80)
+cajas_siete_lvl_uno = pygame.Rect(999, 447, 242, 80)
+cajas_ocho_lvl_uno = pygame.Rect(1086, 367, 195, 80)
+cajas_nueve_lvl_uno = pygame.Rect(0, 275, 58, 330)
+cajas_diez_lvl_uno = pygame.Rect(0, 5, 80, 240)
+cajas_once_lvl_uno = pygame.Rect(1225, 207, 80, 160)
+plataforma_uno_lvl_uno = pygame.Rect(0, 246, 450, 25)
+plataforma_dos_lvl_uno = pygame.Rect(778, 367, 180, 25)
+piso_lvl_uno  = pygame.Rect(0, 606, ANCHO, 50)
+
+plataformas_nivel_uno = [plataforma_uno_lvl_uno, plataforma_dos_lvl_uno, 
+                        cajas_uno_lvl_uno, cajas_dos_lvl_uno, cajas_tres_lvl_uno, 
+                        cajas_cuatro_lvl_uno, cajas_cinco_lvl_uno, cajas_seis_lvl_uno, 
+                        cajas_siete_lvl_uno, cajas_ocho_lvl_uno, cajas_nueve_lvl_uno,
+                        cajas_diez_lvl_uno, cajas_once_lvl_uno, piso_lvl_uno]
+
+
+#PLATAFORMAS NIVEL DOS
+
+plataforma_uno_lvl_dos = pygame.Rect(65, 246, 459, 25)
+plataforma_dos_lvl_dos = pygame.Rect(752, 246, 472, 25)
+plataforma_movil_lvl_dos = pygame.Rect(527, 565, 222, 50)
+cajas_uno_lvl_dos = pygame.Rect(0, 0, 60, 605)
+cajas_dos_lvl_dos = pygame.Rect(395, 528, 80, 80)
+cajas_tres_lvl_dos = pygame.Rect(785, 528, 80, 80)
+pared_lvl_dos = pygame.Rect(1226, 0, 60, 605)
+piso_uno_lvl_dos  = pygame.Rect(0, 606, 508, 100)
+piso_dos_lvl_dos  = pygame.Rect(770, 606, 508, 100)
+pinchos_lvl_dos = pygame.Rect(509, 670, 260, 100)
+tuberia_lvl_dos = pygame.Rect(970, 95, 130, 25)
+
+plataformas_nivel_dos = [plataforma_uno_lvl_dos, plataforma_dos_lvl_dos,  
+                         piso_uno_lvl_dos, piso_dos_lvl_dos, pared_lvl_dos, 
+                         plataforma_movil_lvl_dos, cajas_uno_lvl_dos, 
+                         cajas_dos_lvl_dos, cajas_tres_lvl_dos, tuberia_lvl_dos]
+
+#PLATAFORMAS NIVEL TRES
+
+piso_lvl_tres  = pygame.Rect(0, 606, ANCHO, 50)
+lvl_tres_pared_uno = pygame.Rect(0, 0, 49, 605)
+lvl_tres_pared_dos = pygame.Rect(1230, 55, 49, 560)
+lvl_tres_plataforma_uno = pygame.Rect(80, 239, 192, 25)
+lvl_tres_plataforma_dos = pygame.Rect(344, 239, 598, 25)
+lvl_tres_plataforma_tres = pygame.Rect(1014, 239, 198, 25)
+lvl_tres_plataforma_cuatro = pygame.Rect(50, 27, 195, 25)
+lvl_tres_cajas_uno = pygame.Rect(75, 79, 80, 160)
+lvl_tres_cajas_dos = pygame.Rect(1135, 79, 80, 160)
+lvl_tres_rect_plataforma_mv_uno = pygame.Rect(273, 239, 70, 15)
+lvl_tres_rect_plataforma_mv_dos = pygame.Rect(943, 239, 70, 15)
+lvl_tres_cañeria = pygame.Rect(1200, 53, 300, 25)
+
+plataformas_nivel_tres = [piso_lvl_tres, lvl_tres_pared_uno, 
+                          lvl_tres_pared_dos, lvl_tres_plataforma_uno, 
+                          lvl_tres_plataforma_dos, lvl_tres_plataforma_tres,
+                          lvl_tres_cajas_uno, lvl_tres_cajas_dos,
+                          lvl_tres_rect_plataforma_mv_uno, lvl_tres_rect_plataforma_mv_dos,
+                          lvl_tres_plataforma_cuatro, lvl_tres_cañeria]
+
+limites_boss = [piso_lvl_tres, lvl_tres_pared_uno, lvl_tres_pared_dos]
