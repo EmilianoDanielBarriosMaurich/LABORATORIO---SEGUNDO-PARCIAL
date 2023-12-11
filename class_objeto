@@ -1,0 +1,80 @@
+from animaciones import*
+from funciones import*
+import pygame
+
+
+#CLASE OBJETO
+class Objeto(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, botiquin = False, municion = False, puntos = False):
+        super().__init__()
+        self.animaciones = get_animations_object()
+        self.botiquin = botiquin
+        self.municion = municion
+        self.puntos = puntos
+        if self.botiquin:
+            self.indice = 4
+        elif self.municion:
+            self.indice = 6
+        elif self.puntos:
+            self.indice = 0
+        self.image = self.animaciones[self.indice]
+        self.rect = self.image.get_rect()
+        self.rect.x = pos_x
+        self.rect.y = pos_y
+        self.velocidad_y = 15
+        self.contador_frames = 0
+        self.sonido_botiquin = pygame.mixer.Sound(r"Recursos\Sonidos\botiquin.mp3")
+        self.sonido_municion = pygame.mixer.Sound(r"Recursos\Sonidos\municion.mp3")
+        self.sonido_punto = pygame.mixer.Sound(r"Recursos\Sonidos\punto.mp3")
+        
+    def update(self):
+        #MOVIMIENTO VERTICAL
+        self.rect.y += self.velocidad_y
+        self.velocidad_y += 1
+
+        #PUNTOS
+        if self.puntos:
+            self.velocidad_y = 0
+            self.contador_frames += 1
+            if self.contador_frames == 2:
+                self.indice += 1
+                self.contador_frames = 0
+                if self.indice > 3 or self.indice < 0:
+                    self.indice = 0
+
+        #BOTIQUINES
+        elif self.botiquin:
+            self.contador_frames += 1
+            if self.contador_frames == 3:
+                self.indice += 1
+                self.contador_frames = 0
+                if self.indice > 5 or self.indice < 4:
+                    self.indice = 4
+
+        #MUNICION
+        elif self.municion:
+            self.contador_frames += 1
+            if self.contador_frames == 3:
+                self.indice += 1
+                self.contador_frames = 0
+                if self.indice > 7 or self.indice < 6:
+                    self.indice = 6
+
+        self.image = self.animaciones[self.indice]
+
+    def detectar_jugador(self):
+        self.rect.x += 2000
+        if self.puntos:
+            self.sonido_punto.play()
+        elif self.botiquin:
+            self.sonido_botiquin.play()
+        elif self.municion:
+            self.sonido_municion.play()
+            
+    def detectar_plataforma(self, plataformas):
+        for plataforma in plataformas:
+            if crear_borde_inferior(self.rect).colliderect(plataforma):
+                if self.rect.bottom >= plataforma.top:
+                    self.rect.bottom = plataforma.top
+                    self.velocidad_y = 1
+           
