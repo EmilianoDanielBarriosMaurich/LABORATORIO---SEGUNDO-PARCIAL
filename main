@@ -1,0 +1,1036 @@
+import pygame
+from class_personajes import Jugador
+from class_enemigo import Enemigo, Ciego, Jefe
+from class_objetos import Objeto
+from escenario import*
+from random import randint
+from plataformas import*
+from funciones import*
+from config import*
+
+def generar_enemigos(pos_x, pos_y):
+    enemigo = Enemigo(pos_x, pos_y)
+    return enemigo
+
+def generar_enemigos_ciegos(pos_x, pos_y):
+    enemigo = Ciego(pos_x, pos_y)
+    return enemigo
+
+def generar_puntos(pos_x, pos_y):
+    puntos = Objeto(pos_x, pos_y, False, False, True)
+    return puntos
+
+def generar_botiquines(pos_x, pos_y):
+    botiquin = Objeto(pos_x, pos_y, True, False, False)
+    return botiquin
+
+def generar_municion(pos_x, pos_y):
+    municion = Objeto(pos_x, pos_y, False, True, False)
+    return municion
+
+pygame.init()
+
+#CREO EL RELOJ
+reloj = pygame.time.Clock()
+
+#CREO LA PANTALLA
+ventana = pygame.display.set_mode(TAMAÑO)
+pygame.display.set_caption("Alerta Zombie!!!")
+pygame.display.set_icon(pygame.image.load(r"Recursos\Jugador\Reposo\personaje principal - idle1.png"))
+
+#SONIDOS
+disparo = pygame.mixer.Sound(r"Recursos\Sonidos\disparo.mp3")
+arma_descargada = pygame.mixer.Sound(r"Recursos\Sonidos\arma descargada.mp3")
+martillazo = pygame.mixer.Sound(r"Recursos\Sonidos\golpe.mp3")
+
+#MUSICA
+inicio = pygame.mixer.Sound(r"Recursos\Musica\13. Intermission From DOOM.mp3 ")
+lvl_uno_ambiente = pygame.mixer.Sound(r"Recursos\Musica\02. At Doom's Gate.mp3")
+lvl_dos_ambiente = pygame.mixer.Sound(r"Recursos\Musica\07. On The Hunt.mp3")
+lvl_tres_ambiente = pygame.mixer.Sound(r"Recursos\Musica\10. Hiding The Secrets.mp3")
+                 
+#PERSONAJES Y OBJETOS
+jugador = Jugador()
+jefe = Jefe(900, 400)
+
+lista_enemigos = []
+lista_enemigos_ciegos = []
+lista_disparo_enemigo = []
+
+lista_botiquines = []
+lista_municion = []
+
+sprites_lvl_uno = pygame.sprite.Group()
+sprites_lvl_dos = pygame.sprite.Group()
+sprites_lvl_tres = pygame.sprite.Group()
+
+sprites_lvl_uno.add(jugador)
+sprites_lvl_dos.add(jugador)
+sprites_lvl_tres.add(jugador)
+
+sprites_lvl_tres.add(jefe)
+
+#PUNTOS
+puntos_lvl_uno = [{"punto":generar_puntos(100, 190), "obtenido": False},
+                  {"punto":generar_puntos(180, 190), "obtenido": False},
+                  {"punto":generar_puntos(260, 190), "obtenido": False},
+                  {"punto":generar_puntos(340, 190), "obtenido": False},
+                  {"punto":generar_puntos(850, 230), "obtenido": False},
+                  {"punto":generar_puntos(780, 310), "obtenido": False},
+                  {"punto":generar_puntos(920, 310), "obtenido": False},
+                  {"punto":generar_puntos(1150, 310), "obtenido": False},
+                  {"punto":generar_puntos(940, 470), "obtenido": False},
+                  {"punto":generar_puntos(750, 550), "obtenido": False}]
+
+for punto in puntos_lvl_uno:
+    sprites_lvl_uno.add(punto["punto"])
+
+puntos_lvl_dos = [{"punto":generar_puntos(610, 450), "obtenido": False},
+                  {"punto":generar_puntos(610, 370), "obtenido": False},
+                  {"punto":generar_puntos(610, 290), "obtenido": False},
+                  {"punto":generar_puntos(610, 210), "obtenido": False},
+                  {"punto":generar_puntos(610, 130), "obtenido": False},
+                  {"punto":generar_puntos(180, 190), "obtenido": False},
+                  {"punto":generar_puntos(390, 190), "obtenido": False},
+                  {"punto":generar_puntos(890, 190), "obtenido": False},
+                  {"punto":generar_puntos(1090, 190), "obtenido": False},
+                  {"punto":generar_puntos(1040, 550), "obtenido": False}]
+
+for punto in puntos_lvl_dos:
+    sprites_lvl_dos.add(punto["punto"])
+
+puntos_lvl_tres = [{"punto":generar_puntos(190, 180), "obtenido": False},
+                  {"punto":generar_puntos(300, 180), "obtenido": False},
+                  {"punto":generar_puntos(410, 180), "obtenido": False},
+                  {"punto":generar_puntos(520, 180), "obtenido": False},
+                  {"punto":generar_puntos(630, 180), "obtenido": False},
+                  {"punto":generar_puntos(740, 180), "obtenido": False},
+                  {"punto":generar_puntos(850, 180), "obtenido": False},
+                  {"punto":generar_puntos(960, 180), "obtenido": False},
+                  {"punto":generar_puntos(1070, 180), "obtenido": False},
+                  {"punto":generar_puntos(610, 550), "obtenido": False}]  
+  
+for punto in puntos_lvl_tres:
+    sprites_lvl_tres.add(punto["punto"])
+
+#BOTONES
+rect_jugar = pygame.Rect(540, 400, 200, 80)
+rect_salir = pygame.Rect(540, 500, 200, 80)
+rect_nivel_uno = pygame.Rect(540, 300, 200, 80)
+rect_nivel_dos = pygame.Rect(540, 400, 200, 80)
+rect_nivel_tres = pygame.Rect(540, 500, 200, 80)
+fuente = pygame.font.SysFont("Consolas", 75)
+fuente_dos = pygame.font.SysFont("Consolas", 35)
+
+#COORDENADAS
+posicion_nube_uno_lvl_uno = 0
+posicion_nube_dos_lvl_uno = -1280
+posicion_nube_uno_lvl_dos = 0
+posicion_nube_dos_lvl_dos = -1280
+posicion_nube_uno_lvl_tres = 0
+posicion_nube_dos_lvl_tres = -1280
+
+posicion_plataforma_mv_lvl_dos = 0
+posicion_plataforma_mv_uno = 239
+posicion_plataforma_mv_dos = 530
+
+#VARIABLES VARIAS
+nivel_uno = False
+nivel_dos = False
+nivel_tres = False
+
+tope_uno_lvl_tres = False
+tope_dos_lvl_tres = False
+tope_lvl_dos = False
+
+contador = 0
+
+while True:
+
+    inicio.play()
+    lvl_uno_ambiente.stop()
+    lvl_dos_ambiente.stop()
+    lvl_tres_ambiente.stop()
+    
+    pygame.mouse.set_visible(True)
+    ventana.fill(VERDE_MILITAR)
+    titulo = fuente.render("ALERTA ZOMBIE!!!", True, ROJO_OSCURO)
+    rect_titulo = titulo.get_rect(midtop = (ANCHO//2, 50))
+    ventana.blit(titulo, rect_titulo)
+    esperar_menu(rect_jugar, rect_salir, ventana, 50)
+
+    ventana.fill(VERDE_MILITAR)
+    
+    if elegir_nivel(rect_nivel_uno, rect_nivel_dos, rect_nivel_tres, ventana, 50) == 1:
+        nivel_uno = True
+        nivel_dos = False
+        nivel_tres = False
+    elif elegir_nivel(rect_nivel_uno, rect_nivel_dos, rect_nivel_tres, ventana, 50) == 2:
+        nivel_uno = False
+        nivel_dos = True
+        nivel_tres = False
+    elif elegir_nivel(rect_nivel_uno, rect_nivel_dos, rect_nivel_tres, ventana, 50) == 3:
+        nivel_uno = False
+        nivel_dos = False
+        nivel_tres = True
+
+    jugador.vida = 3
+    jefe.vida = 15
+    jugador.rect.x = 60
+    jugador.rect.y = 540
+    jefe.rect.x = 900
+    jefe.rect.y = 400
+    lista_disparo = []
+    lista_disparo_enemigo = []
+    lista_disparo_jefe = []
+    jugador.puntaje = 0
+    jugador.municion = 20
+
+    if nivel_uno:
+        inicio.stop()
+        lvl_uno_ambiente.play(-1)
+        tiempo_partida = FPS*60
+        for enemigo in lista_enemigos:
+            enemigo.rect.y = -200
+            enemigo.rect.x = randint(100, 300)
+        for botiquin in lista_botiquines:
+            botiquin.rect.y = -200
+            botiquin.rect.x = randint(200, 1100)
+        for municion in lista_municion:
+            municion.rect.y = -200
+            municion.rect.x = randint(200, 1100)
+    if nivel_dos:
+        inicio.stop()
+        lvl_dos_ambiente.play(-1)
+        tiempo_partida = FPS*60
+        for enemigo in lista_enemigos:
+            enemigo.rect.y = -200
+            enemigo.rect.x = randint(100, 300)
+        for enemigo in lista_enemigos_ciegos:
+            enemigo.rect.y = -200
+            enemigo.rect.x = 1070
+            enemigo.ataca = False
+            enemigo.velocidad_x = -3
+        for botiquin in lista_botiquines:
+            botiquin.rect.y = -200
+            botiquin.rect.x = randint(200, 960)
+        for municion in lista_municion:
+            municion.rect.y = -200
+            municion.rect.x = randint(200, 960)
+    if nivel_tres:
+        inicio.stop()
+        lvl_tres_ambiente.play(-1)
+        tiempo_partida = FPS*300
+        for enemigo in lista_enemigos:
+            enemigo.rect.y = -200
+            enemigo.rect.x = randint(90, 150)
+        for enemigo in lista_enemigos_ciegos:
+            enemigo.rect.y = -200
+            enemigo.rect.x = 1400
+            enemigo.ataca = False
+            enemigo.velocidad_x = -3
+        for botiquin in lista_botiquines:
+            botiquin.rect.y = -200
+            botiquin.rect.x = randint(300, 960)
+        for municion in lista_municion:
+            municion.rect.y = -200
+            municion.rect.x = randint(300, 960)
+
+#########################################################################################################################
+#########################################################NIVEL 1#########################################################
+#########################################################################################################################
+
+    while nivel_uno:
+
+        reloj.tick(FPS)
+        temporizador = tiempo_partida/20
+
+        texto_vidas = fuente_dos.render(f"VIDAS: {jugador.vida}", True, ROJO)
+        rect_vidas = texto_vidas.get_rect(topleft = (30, 40))
+        texto_municion = fuente_dos.render(f"MUNICION: {jugador.municion:0.0f}", True, ROJO)
+        rect_municion = texto_municion.get_rect(topleft = (30, 70))
+        texto_tiempo = fuente_dos.render(f"TIEMPO: {temporizador:.2f}", True, ROJO)
+        rect_tiempo = texto_tiempo.get_rect(topright = (ANCHO - 30, 40))
+        texto_puntos = fuente_dos.render(f"PUNTAJE: {jugador.puntaje}", True, ROJO)
+        rect_puntos = texto_puntos.get_rect(topright = (ANCHO - 30, 70))
+
+        tiempo_partida -= 1
+
+        if len(lista_enemigos) < 3:
+            lista_enemigos.append(generar_enemigos(randint(110, 540), -200))
+
+        for enemigo in lista_enemigos:
+            sprites_lvl_uno.add(enemigo)
+     
+        if len(lista_botiquines) == 0:
+            lista_botiquines.append(generar_botiquines(randint(200, 1100), -50))
+
+        for botiquin in lista_botiquines:
+            sprites_lvl_uno.add(botiquin)
+
+        if len(lista_municion) == 0:
+            lista_municion.append(generar_municion(randint(200, 1100), -50))
+        
+        for municion in lista_municion:
+            sprites_lvl_uno.add(municion)
+
+        pygame.mouse.set_visible(False)
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    nivel_uno = False
+                    lvl_uno_ambiente.stop()
+                    for calavera in puntos_lvl_uno:
+                        if calavera["obtenido"]:
+                            calavera["punto"].rect.x -=2000
+                            calavera["obtenido"] = False
+                if event.key == pygame.K_d:
+                    jugador.velocidad_x += 10
+                if event.key == pygame.K_a:
+                    jugador.velocidad_x -= 10
+                if event.key == pygame.K_SPACE:
+                    jugador.saltar()
+                if event.key == pygame.K_RIGHT and jugador.saltando == False and jugador.velocidad_x == 0:
+                    martillazo.play()
+                if event.key == pygame.K_LEFT and jugador.saltando == False and jugador.velocidad_x == 0:
+                    if jugador.municion >= 1:
+                        disparo.play()
+                    elif jugador.municion == 0:
+                        arma_descargada.play()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_d:
+                    jugador.velocidad_x = 0
+                if event.key == pygame.K_a:
+                    jugador.velocidad_x = 0
+                if event.key == pygame.K_LEFT:
+                    contador = 0
+                if event.key == pygame.K_RIGHT:
+                    contador = 0
+
+        tecla = pygame.key.get_pressed()
+        
+        if tecla[pygame.K_LEFT] and contador < 4 and jugador.saltando == False and jugador.velocidad_x == 0:
+            jugador.disparo = True  
+            contador += 1
+            jugador.municion -= 0.25
+            if contador == 1 and jugador.municion > 0:
+                if jugador.derecha:
+                    lista_disparo.append(crear_bloque(jugador.rect.centerx, jugador.rect.centery, 8, 2, ROJO, 20))
+                else:
+                    lista_disparo.append(crear_bloque(jugador.rect.centerx, jugador.rect.centery, 8, 2, ROJO, -20))
+            if jugador.municion <= 0:
+                jugador.municion = 0
+        else:
+            jugador.disparo = False
+        if tecla[pygame.K_RIGHT] and contador < 4:
+            jugador.golpe = True
+            contador += 1
+        else: 
+            jugador.golpe = False
+
+        #COMPORTAMIENTO PROYECTIL
+
+        for proyectil in lista_disparo:
+            proyectil["rect"].x += proyectil["velocidad_x"]
+            
+        for proyectil in lista_disparo:    
+            for plataforma in plataformas_nivel_uno:
+                if proyectil["rect"].colliderect(plataforma):
+                    lista_disparo.remove(proyectil)
+
+        #INTERACCION CON ENEMIGOS
+        for enemigo in lista_enemigos[:]:
+            enemigo.detectar_plataforma(plataformas_nivel_uno)
+            if jugador.golpe:
+                enemigo.detectar_impacto(jugador.rect, 3)
+            else:
+                if jugador.velocidad_y >= 18:
+                    enemigo.detectar_impacto(jugador.rect, 3)
+                elif enemigo.esta_muerto == False:
+                    jugador.detectar_enemigo(enemigo.rect)
+            if enemigo.vida > 0:
+                enemigo.detectar_proximidad(jugador.rect)
+            else:
+                lista_enemigos.remove(enemigo)
+                enemigo.rect.y -= 20
+                jugador.puntaje += 10
+
+        for proyectil in lista_disparo:
+            for enemigo in lista_enemigos:
+                if proyectil["rect"].colliderect(crear_nucleo(enemigo.rect)):
+                    enemigo.detectar_impacto(proyectil["rect"], 1)
+                    try:
+                        lista_disparo.remove(proyectil)
+                    except:
+                        None
+
+        #COMPORTAMIENTO CON OBJETOS
+
+        for botiquin in lista_botiquines[:]:
+            botiquin.detectar_plataforma(plataformas_nivel_uno)
+            if botiquin.rect.colliderect(jugador.rect) and jugador.vida < 3:
+                botiquin.detectar_jugador()
+                lista_botiquines.remove(botiquin)
+                jugador.vida = 3
+
+        for municion in lista_municion[:]:
+            municion.detectar_plataforma(plataformas_nivel_uno)
+            if municion.rect.colliderect(jugador.rect) and jugador.municion < 20:
+                municion.detectar_jugador()
+                lista_municion.remove(municion)
+                jugador.municion = 20
+
+        
+        for calavera in puntos_lvl_uno:
+            if calavera["punto"].rect.colliderect(jugador.rect):
+                calavera["punto"].detectar_jugador()
+                calavera["obtenido"] = True
+                jugador.puntaje += 50
+
+        
+        ventana.blit(lvl_uno_nubes_uno, (posicion_nube_uno_lvl_uno, 0))
+        ventana.blit(lvl_uno_nubes_dos, (posicion_nube_dos_lvl_uno, 0))
+        posicion_nube_uno_lvl_uno += 1
+        posicion_nube_dos_lvl_uno += 1
+        if posicion_nube_dos_lvl_uno == 0:
+            posicion_nube_dos_lvl_uno = -1280
+        if posicion_nube_uno_lvl_uno == 1280:
+            posicion_nube_uno_lvl_uno = 0
+
+        ventana.blit(lvl_uno_escenario, (0, 0))
+        sprites_lvl_uno.update()
+        jugador.detectar_plataforma(plataformas_nivel_uno)
+
+        sprites_lvl_uno.draw(ventana)
+        for proyectil in lista_disparo:
+            pygame.draw.rect(ventana, proyectil["color"], proyectil["rect"])
+        ventana.blit(lvl_uno_cadenas, (0, 0))
+
+        ventana.blit(texto_puntos, rect_puntos)
+        ventana.blit(texto_vidas, rect_vidas)
+        ventana.blit(texto_municion, rect_municion)
+        ventana.blit(texto_tiempo, rect_tiempo)
+            
+        if tiempo_partida == 0 or jugador.vida <= 0:
+            nivel_uno = False
+            lvl_uno_ambiente.stop()
+            for calavera in puntos_lvl_uno:
+                if calavera["obtenido"]:
+                    calavera["punto"].rect.x -=2000
+                    calavera["obtenido"] = False
+                
+        pygame.display.flip()
+
+#########################################################################################################################
+#########################################################NIVEL 2#########################################################
+#########################################################################################################################
+
+    while nivel_dos:
+        reloj.tick(FPS)
+
+        temporizador = tiempo_partida/20
+
+        texto_vidas = fuente_dos.render(f"VIDAS: {jugador.vida}", True, ROJO)
+        rect_vidas = texto_vidas.get_rect(topleft = (30, 40))
+        texto_municion = fuente_dos.render(f"MUNICION: {jugador.municion:0.0f}", True, ROJO)
+        rect_municion = texto_municion.get_rect(topleft = (30, 70))
+        texto_tiempo = fuente_dos.render(f"TIEMPO: {temporizador:.2f}", True, ROJO)
+        rect_tiempo = texto_tiempo.get_rect(topright = (ANCHO - 30, 40))
+        texto_puntos = fuente_dos.render(f"PUNTAJE: {jugador.puntaje}", True, ROJO)
+        rect_puntos = texto_puntos.get_rect(topright = (ANCHO - 30, 70))
+
+        tiempo_partida -= 1
+        
+        if len(lista_enemigos) < 3:
+            lista_enemigos.append(generar_enemigos(randint(90, 540), -200))
+
+        for enemigo in lista_enemigos:
+            sprites_lvl_dos.add(enemigo)
+
+        if len(lista_enemigos_ciegos) < 1:
+            lista_enemigos_ciegos.append(generar_enemigos_ciegos(1070, -200))
+
+        for enemigo in lista_enemigos_ciegos:
+            sprites_lvl_dos.add(enemigo)
+
+        if len(lista_botiquines) == 0:
+            lista_botiquines.append(generar_botiquines(randint(90, 960), -50))
+
+        for botiquin in lista_botiquines:
+            sprites_lvl_dos.add(botiquin)    
+
+        if len(lista_municion) == 0:
+            lista_municion.append(generar_municion(randint(90, 960), -50))
+
+        for municion in lista_municion:
+            sprites_lvl_dos.add(municion) 
+
+        pygame.mouse.set_visible(False)
+#########################################################################################
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    nivel_dos = False
+                    lvl_dos_ambiente.stop()
+                    for calavera in puntos_lvl_dos:
+                        if calavera["obtenido"]:
+                            calavera["punto"].rect.x -=2000
+                            calavera["obtenido"] = False
+                if event.key == pygame.K_d:
+                    jugador.velocidad_x += 10
+                if event.key == pygame.K_a:
+                    jugador.velocidad_x -= 10
+                if event.key == pygame.K_SPACE:
+                    jugador.saltar()
+                if event.key == pygame.K_RIGHT and jugador.saltando == False and jugador.velocidad_x == 0:
+                    martillazo.play()
+                if event.key == pygame.K_LEFT and jugador.saltando == False and jugador.velocidad_x == 0:
+                    if jugador.municion >= 1:
+                        disparo.play()
+                    elif jugador.municion == 0:
+                        arma_descargada.play()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_d:
+                    jugador.velocidad_x = 0
+                if event.key == pygame.K_a:
+                    jugador.velocidad_x = 0
+                if event.key == pygame.K_LEFT:
+                    contador = 0
+                if event.key == pygame.K_RIGHT:
+                    contador = 0
+
+        tecla = pygame.key.get_pressed()
+        
+        if tecla[pygame.K_LEFT] and contador < 4 and jugador.saltando == False and jugador.velocidad_x == 0:
+            jugador.disparo = True  
+            contador += 1
+            jugador.municion -= 0.25
+            if contador == 1 and jugador.municion > 0:
+                if jugador.derecha:
+                    lista_disparo.append(crear_bloque(jugador.rect.centerx, jugador.rect.centery, 8, 2, ROJO, 20))
+                else:
+                    lista_disparo.append(crear_bloque(jugador.rect.centerx, jugador.rect.centery, 8, 2, ROJO, -20))
+            if jugador.municion <= 0:
+                jugador.municion = 0
+        else:
+            jugador.disparo = False
+        if tecla[pygame.K_RIGHT] and contador < 4:
+            jugador.golpe = True
+            contador += 1
+        else: 
+            jugador.golpe = False
+#########################################################################################
+        #COMPORTAMIENTO PROYECTIL
+
+        for proyectil in lista_disparo:
+            proyectil["rect"].x += proyectil["velocidad_x"]
+            
+        for proyectil in lista_disparo:    
+            for plataforma in plataformas_nivel_dos:
+                if proyectil["rect"].colliderect(plataforma):
+                    lista_disparo.remove(proyectil)
+#########################################################################################
+        #INTERACCION CON ENEMIGOS
+
+        for enemigo in lista_enemigos[:]:
+            enemigo.detectar_plataforma(plataformas_nivel_dos)
+            if jugador.golpe:
+                enemigo.detectar_impacto(jugador.rect, 3)
+            else:
+                if jugador.velocidad_y >= 18:
+                    enemigo.detectar_impacto(jugador.rect, 3)
+                elif enemigo.esta_muerto == False:
+                    jugador.detectar_enemigo(enemigo.rect)
+            if enemigo.vida > 0:
+                enemigo.detectar_proximidad(jugador.rect)
+            else:
+                lista_enemigos.remove(enemigo)
+                enemigo.rect.y -= 20
+                jugador.puntaje += 10
+            if enemigo.rect.top > ALTO:
+                lista_enemigos.remove(enemigo)
+
+        for proyectil in lista_disparo:
+            for enemigo in lista_enemigos:
+                if proyectil["rect"].colliderect(crear_nucleo(enemigo.rect)):
+                    enemigo.detectar_impacto(proyectil["rect"], 1)
+                    try:
+                        lista_disparo.remove(proyectil)
+                    except:
+                        None
+#########################################################################################
+        for enemigo in lista_enemigos_ciegos[:]:
+            enemigo.detectar_plataforma(plataformas_nivel_dos)
+            enemigo.detectar_lejania(jugador.rect) 
+            if jugador.golpe:
+                enemigo.detectar_impacto(jugador.rect, 3)
+            else:
+                if jugador.velocidad_y >= 18:
+                    enemigo.detectar_impacto(jugador.rect, 3)
+                elif enemigo.esta_muerto == False:
+                    jugador.detectar_enemigo(enemigo.rect)
+            if enemigo.vida > 0:
+                enemigo.detectar_proximidad(jugador.rect)  
+            if enemigo.vida <= 0:
+                lista_enemigos_ciegos.remove(enemigo)
+                enemigo.rect.y -= 20
+                jugador.puntaje += 10
+            if enemigo.rect.top > ALTO:
+                lista_enemigos_ciegos.remove(enemigo)
+
+        for proyectil in lista_disparo:
+            for enemigo in lista_enemigos_ciegos:
+                if proyectil["rect"].colliderect(crear_nucleo(enemigo.rect)):
+                    enemigo.detectar_impacto(proyectil["rect"], 1)
+                    try:
+                        lista_disparo.remove(proyectil)
+                    except:
+                        None
+
+        for enemigo in lista_enemigos_ciegos:
+            if enemigo.ataca and len(lista_disparo_enemigo) < 1:
+                if enemigo.derecha:
+                    lista_disparo_enemigo.append(crear_bloque(enemigo.rect.centerx, enemigo.rect.centery - 20, 10, 5, VERDE, 20))
+                else:
+                    lista_disparo_enemigo.append(crear_bloque(enemigo.rect.centerx, enemigo.rect.centery  - 20, 10, 5, VERDE, -20))
+
+        for proyectil in lista_disparo_enemigo:
+            proyectil["rect"].x += proyectil["velocidad_x"]
+            if proyectil["rect"].x < 0 or proyectil["rect"].x > ANCHO:
+                lista_disparo_enemigo.remove(proyectil)
+            
+        for proyectil in lista_disparo_enemigo:    
+            for plataforma in plataformas_nivel_dos:
+                if proyectil["rect"].colliderect(plataforma):
+                    lista_disparo_enemigo.remove(proyectil)
+        
+        for proyectil in lista_disparo_enemigo:
+            if proyectil["rect"].colliderect(crear_nucleo(jugador.rect)):
+                jugador.detectar_enemigo(proyectil["rect"])
+                try:
+                    lista_disparo_enemigo.remove(proyectil)
+                except:
+                    None
+#########################################################################################
+        #COMPORTAMIENTO CON OBJETOS
+
+        for botiquin in lista_botiquines[:]:
+            botiquin.detectar_plataforma(plataformas_nivel_dos)
+            if botiquin.rect.colliderect(jugador.rect) and jugador.vida < 3:
+                botiquin.detectar_jugador()
+                lista_botiquines.remove(botiquin)
+                jugador.vida = 3
+
+        for municion in lista_municion[:]:
+            municion.detectar_plataforma(plataformas_nivel_dos)
+            if municion.rect.colliderect(jugador.rect) and jugador.municion < 20:
+                municion.detectar_jugador()
+                lista_municion.remove(municion)
+                jugador.municion = 20
+
+        for calavera in puntos_lvl_dos:
+            if calavera["punto"].rect.colliderect(jugador.rect):
+                calavera["punto"].detectar_jugador()
+                calavera["obtenido"] = True
+                jugador.puntaje += 50
+#########################################################################################                  
+        ventana.blit(lvl_dos_nubes_uno, (posicion_nube_uno_lvl_dos, 0))
+        ventana.blit(lvl_dos_nubes_dos, (posicion_nube_dos_lvl_dos, 0))
+        posicion_nube_uno_lvl_dos += 1
+        posicion_nube_dos_lvl_dos += 1
+        if posicion_nube_dos_lvl_dos == 0:
+            posicion_nube_dos_lvl_dos = -1280
+        if posicion_nube_uno_lvl_dos == 1280:
+            posicion_nube_uno_lvl_dos = 0
+        ventana.blit(lvl_dos_escenario, (0, 0))
+        sprites_lvl_dos.draw(ventana)
+#########################################################################################
+        #POSICION PLATAFORMA MOVIL
+        ventana.blit(lvl_dos_plataforma_mv, (527, posicion_plataforma_mv_lvl_dos))
+        if posicion_plataforma_mv_lvl_dos >= -320 and tope_lvl_dos == False:
+            posicion_plataforma_mv_lvl_dos -= 5
+            if posicion_plataforma_mv_lvl_dos <= -320:
+                tope_lvl_dos = True
+        if posicion_plataforma_mv_lvl_dos <= 0 and tope_lvl_dos == True:
+            posicion_plataforma_mv_lvl_dos += 5
+            if posicion_plataforma_mv_lvl_dos >= 0:
+                tope_lvl_dos = False
+
+        plataforma_movil_lvl_dos.y = posicion_plataforma_mv_lvl_dos + 560
+#########################################################################################       
+        sprites_lvl_dos.update()
+        jugador.detectar_plataforma(plataformas_nivel_dos)
+        jugador.detectar_enemigo(pinchos_lvl_dos)
+        for proyectil in lista_disparo:
+            pygame.draw.rect(ventana, proyectil["color"], proyectil["rect"])
+        for proyectil in lista_disparo_enemigo:
+            pygame.draw.rect(ventana, proyectil["color"], proyectil["rect"])
+
+        ventana.blit(lvl_dos_cadenas, (0, 0))
+        # for plataforma in plataformas_nivel_dos:
+        #     pygame.draw.rect(ventana, ROJO, plataforma, 1)
+        # pygame.draw.rect(ventana, ROJO, plataforma_movil_lvl_dos, 1)
+        
+        ventana.blit(texto_puntos, rect_puntos)
+        ventana.blit(texto_vidas, rect_vidas)
+        ventana.blit(texto_municion, rect_municion)
+        ventana.blit(texto_tiempo, rect_tiempo)
+
+        if tiempo_partida == 0 or jugador.vida <= 0:
+            nivel_dos = False
+            lvl_dos_ambiente.stop()
+            for calavera in puntos_lvl_dos:
+                if calavera["obtenido"]:
+                    calavera["punto"].rect.x -=2000
+                    calavera["obtenido"] = False
+    
+        pygame.display.flip()    
+
+#########################################################################################################################
+#########################################################NIVEL 3#########################################################
+#########################################################################################################################
+
+    while nivel_tres:
+        reloj.tick(FPS)
+
+        temporizador = tiempo_partida/20
+
+        texto_vidas = fuente_dos.render(f"VIDAS: {jugador.vida}", True, ROJO)
+        rect_vidas = texto_vidas.get_rect(topleft = (30, 40))
+        texto_municion = fuente_dos.render(f"MUNICION: {jugador.municion:0.0f}", True, ROJO)
+        rect_municion = texto_municion.get_rect(topleft = (30, 70))
+        texto_tiempo = fuente_dos.render(f"TIEMPO: {temporizador:.2f}", True, ROJO)
+        rect_tiempo = texto_tiempo.get_rect(topright = (ANCHO - 30, 40))
+        texto_puntos = fuente_dos.render(f"PUNTAJE: {jugador.puntaje}", True, ROJO)
+        rect_puntos = texto_puntos.get_rect(topright = (ANCHO - 30, 70))
+        nombre_jefe = fuente_dos.render(f"ZOMBIE MECANICO", True, ROJO, NEGRO)
+        rect_nombre_jefe = nombre_jefe.get_rect(midtop = (ANCHO//2, 35))
+        texto_vida_jefe = fuente_dos.render(f"VIDA: {jefe.vida}", True, ROJO, NEGRO)
+        rect_vida_jefe = texto_vida_jefe.get_rect(midtop = (ANCHO//2, 70))
+
+        tiempo_partida -= 1
+        
+        if len(lista_enemigos) < 1:
+            lista_enemigos.append(generar_enemigos(randint(90, 150), -200))
+
+        for enemigo in lista_enemigos:
+            sprites_lvl_tres.add(enemigo)
+
+        if len(lista_enemigos_ciegos) < 1:
+            lista_enemigos_ciegos.append(generar_enemigos_ciegos(1400, -200))
+
+        for enemigo in lista_enemigos_ciegos:
+            sprites_lvl_tres.add(enemigo)
+
+        if len(lista_botiquines) == 0:
+            lista_botiquines.append(generar_botiquines(randint(300, 960), -50))
+
+        for botiquin in lista_botiquines:
+            sprites_lvl_tres.add(botiquin)
+
+        if len(lista_municion) == 0:
+            lista_municion.append(generar_municion(randint(300, 960), -50))
+
+        for municion in lista_municion:
+            sprites_lvl_tres.add(municion)
+
+        for punto in puntos_lvl_tres:
+            sprites_lvl_tres.add(punto["punto"])
+        
+        pygame.mouse.set_visible(False)
+#######################################################################################
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    nivel_tres = False
+                    lvl_tres_ambiente.stop()
+                    for calavera in puntos_lvl_tres:
+                        if calavera["obtenido"]:
+                            calavera["punto"].rect.x -=2000
+                            calavera["obtenido"] = False
+                if event.key == pygame.K_d:
+                    jugador.velocidad_x += 10
+                if event.key == pygame.K_a:
+                    jugador.velocidad_x -= 10
+                if event.key == pygame.K_SPACE:
+                    jugador.saltar()
+                if event.key == pygame.K_RIGHT and jugador.saltando == False and jugador.velocidad_x == 0:
+                    martillazo.play()
+                if event.key == pygame.K_LEFT and jugador.saltando == False and jugador.velocidad_x == 0:
+                    if jugador.municion >= 1:
+                        disparo.play()
+                    elif jugador.municion == 0:
+                        arma_descargada.play()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_d:
+                    jugador.velocidad_x = 0
+                if event.key == pygame.K_a:
+                    jugador.velocidad_x = 0
+                if event.key == pygame.K_LEFT:
+                    contador = 0
+                if event.key == pygame.K_RIGHT:
+                    contador = 0
+
+        tecla = pygame.key.get_pressed()
+        
+        if tecla[pygame.K_LEFT] and contador < 4 and jugador.saltando == False and jugador.velocidad_x == 0:
+            jugador.disparo = True  
+            contador += 1
+            jugador.municion -= 0.25
+            if contador == 4 and jugador.municion >= 0:
+                if jugador.derecha:
+                    lista_disparo.append(crear_bloque(jugador.rect.centerx, jugador.rect.centery, 8, 2, ROJO, 20))
+                else:
+                    lista_disparo.append(crear_bloque(jugador.rect.centerx, jugador.rect.centery, 8, 2, ROJO, -20))
+            if jugador.municion <= 0:
+                jugador.municion = 0
+        else:
+            jugador.disparo = False
+        if tecla[pygame.K_RIGHT] and contador < 4:
+            jugador.golpe = True
+            contador += 1
+        else: 
+            jugador.golpe = False
+#######################################################################################
+        #COMPORTAMIENTO PROYECTIL
+
+        for proyectil in lista_disparo:
+            proyectil["rect"].x += proyectil["velocidad_x"]
+            
+        for proyectil in lista_disparo:    
+            for plataforma in plataformas_nivel_tres:
+                if proyectil["rect"].colliderect(plataforma):
+                    lista_disparo.remove(proyectil)
+#######################################################################################
+        #INTERACCION CON ENEMIGOS
+
+        for enemigo in lista_enemigos[:]:
+            enemigo.detectar_plataforma(plataformas_nivel_tres)
+            if jugador.golpe:
+                enemigo.detectar_impacto(jugador.rect, 3)
+            else:
+                if jugador.velocidad_y >= 18:
+                    enemigo.detectar_impacto(jugador.rect, 3)
+                elif enemigo.esta_muerto == False:
+                    jugador.detectar_enemigo(enemigo.rect)
+            if enemigo.vida > 0:
+                enemigo.detectar_proximidad(jugador.rect)
+            else:
+                lista_enemigos.remove(enemigo)
+                enemigo.rect.y -= 20
+                jugador.puntaje += 10
+            if enemigo.rect.top > ALTO:
+                lista_enemigos.remove(enemigo)
+
+        for proyectil in lista_disparo:
+            for enemigo in lista_enemigos:
+                if proyectil["rect"].colliderect(crear_nucleo(enemigo.rect)):
+                    enemigo.detectar_impacto(proyectil["rect"], 1)
+                    try:
+                        lista_disparo.remove(proyectil)
+                    except:
+                        None
+#########################################################################################
+        for enemigo in lista_enemigos_ciegos[:]:
+            enemigo.detectar_lejania(jugador.rect) 
+            enemigo.detectar_plataforma(plataformas_nivel_tres)
+            if jugador.golpe:
+                enemigo.detectar_impacto(jugador.rect, 3)
+            else:
+                if jugador.velocidad_y >= 18:
+                    enemigo.detectar_impacto(jugador.rect, 3)
+                elif enemigo.esta_muerto == False:
+                    jugador.detectar_enemigo(enemigo.rect)
+            if enemigo.vida > 0:
+                enemigo.detectar_proximidad(jugador.rect)  
+            if enemigo.vida <= 0:
+                lista_enemigos_ciegos.remove(enemigo)
+                enemigo.rect.y -= 20
+                jugador.puntaje += 10
+            if enemigo.rect.top > ALTO:
+                lista_enemigos_ciegos.remove(enemigo)
+
+        for proyectil in lista_disparo:
+            for enemigo in lista_enemigos_ciegos:
+                if proyectil["rect"].colliderect(crear_nucleo(enemigo.rect)):
+                    enemigo.detectar_impacto(proyectil["rect"], 1)
+                    try:
+                        lista_disparo.remove(proyectil)
+                    except:
+                        None
+
+        for enemigo in lista_enemigos_ciegos:
+            if enemigo.ataca and len(lista_disparo_enemigo) < 1:
+                if enemigo.derecha:
+                    lista_disparo_enemigo.append(crear_bloque(enemigo.rect.centerx, enemigo.rect.centery - 10, 10, 5, VERDE, 20))
+                else:
+                    lista_disparo_enemigo.append(crear_bloque(enemigo.rect.centerx, enemigo.rect.centery  - 10, 10, 5, VERDE, -20))
+
+        for proyectil in lista_disparo_enemigo:
+            proyectil["rect"].x += proyectil["velocidad_x"]
+            if proyectil["rect"].x < 0 or proyectil["rect"].x > ANCHO:
+                lista_disparo_enemigo.remove(proyectil)
+            
+        for proyectil in lista_disparo_enemigo:    
+            for plataforma in plataformas_nivel_tres:
+                if proyectil["rect"].colliderect(plataforma):
+                    lista_disparo_enemigo.remove(proyectil)
+        
+        for proyectil in lista_disparo_enemigo:
+            if proyectil["rect"].colliderect(crear_nucleo(jugador.rect)):
+                jugador.detectar_enemigo(proyectil["rect"])
+                try:
+                    lista_disparo_enemigo.remove(proyectil)
+                except:
+                    None
+#########################################################################################
+        #JEFE
+
+        jefe.detectar_plataforma(limites_boss)
+        jefe.detectar_proximidad(jugador.rect)
+        if jefe.ataca and jefe.vida > 0:
+            if len(lista_disparo_jefe) < 1:
+                if jefe.derecha:
+                    lista_disparo_jefe.append(crear_bloque(jefe.rect.centerx, jefe.rect.bottom - 25, 20, 2, ROJO, 30))
+                    lista_disparo_jefe.append(crear_bloque(jefe.rect.centerx, jefe.rect.bottom - 30, 20, 2, ROJO, 30))
+                    lista_disparo_jefe.append(crear_bloque(jefe.rect.centerx, jefe.rect.bottom - 35, 20, 2, ROJO, 30))
+                else:
+                    lista_disparo_jefe.append(crear_bloque(jefe.rect.centerx, jefe.rect.bottom - 25, 20, 2, ROJO, -30))
+                    lista_disparo_jefe.append(crear_bloque(jefe.rect.centerx, jefe.rect.bottom - 30, 20, 2, ROJO, -30))
+                    lista_disparo_jefe.append(crear_bloque(jefe.rect.centerx, jefe.rect.bottom - 35, 20, 2, ROJO, -30))
+
+        for proyectil in lista_disparo_jefe:
+            proyectil["rect"].x += proyectil["velocidad_x"]
+            if proyectil["rect"].x < 0 or proyectil["rect"].x > ANCHO:
+                lista_disparo_jefe.remove(proyectil)
+            
+        for proyectil in lista_disparo_jefe:    
+            for plataforma in plataformas_nivel_tres:
+                if proyectil["rect"].colliderect(plataforma):
+                    lista_disparo_jefe.remove(proyectil)
+        
+        for proyectil in lista_disparo_jefe:
+            if proyectil["rect"].colliderect(crear_nucleo(jugador.rect)):
+                jugador.detectar_enemigo(proyectil["rect"])
+                try:
+                    lista_disparo_jefe.remove(proyectil)
+                except:
+                    None
+        for proyectil in lista_disparo:
+            if proyectil["rect"].colliderect(crear_nucleo(jefe.rect)) and jefe.vida > 0:
+                    jefe.detectar_impacto(proyectil["rect"], 1)
+                    try:
+                        lista_disparo.remove(proyectil)
+                    except:
+                        None
+        if jefe.vida < 20 and jefe.vida >= 10:
+            if jugador.rect.colliderect(crear_limite_jefe_der(jefe.rect)) or jugador.rect.colliderect(crear_limite_jefe_izq(jefe.rect)) or jugador.rect.colliderect(crear_nucleo(jefe.rect)):
+                jugador.detectar_enemigo(jefe.rect)
+        elif jefe.vida < 10 and jefe.vida > 0:
+            if jugador.rect.colliderect(jefe.rect):
+                jugador.detectar_enemigo(jefe.rect)
+
+#########################################################################################
+        #COMPORTAMIENTO CON OBJETOS
+
+        for botiquin in lista_botiquines[:]:
+            botiquin.detectar_plataforma(plataformas_nivel_tres)
+            if botiquin.rect.colliderect(jugador.rect) and jugador.vida < 3:
+                botiquin.detectar_jugador()
+                lista_botiquines.remove(botiquin)
+                jugador.vida = 3
+
+        for municion in lista_municion[:]:
+            municion.detectar_plataforma(plataformas_nivel_tres)
+            if municion.rect.colliderect(jugador.rect) and jugador.municion < 20:
+                municion.detectar_jugador()
+                lista_municion.remove(municion)
+                jugador.municion = 20
+
+        for calavera in puntos_lvl_tres:
+            if calavera["punto"].rect.colliderect(jugador.rect):
+                calavera["punto"].detectar_jugador()
+                calavera["obtenido"] = True
+                jugador.puntaje += 50
+#########################################################################################
+        #ESCENARIO
+
+        ventana.blit(lvl_tres_nubes_uno, (posicion_nube_uno_lvl_tres, 0))
+        ventana.blit(lvl_tres_nubes_dos, (posicion_nube_dos_lvl_tres, 0))
+        posicion_nube_uno_lvl_tres += 1
+        posicion_nube_dos_lvl_tres += 1
+        if posicion_nube_dos_lvl_tres == 0:
+            posicion_nube_dos_lvl_tres = -1280
+        if posicion_nube_uno_lvl_tres == 1280:
+            posicion_nube_uno_lvl_tres = 0
+        ventana.blit(lvl_tres_escenario, (0, 0))
+#########################################################################################
+        #PLATAFORMAS MOVILES
+        ventana.blit(lvl_tres_plataforma_mv_uno, (273, posicion_plataforma_mv_uno))
+        ventana.blit(lvl_tres_plataforma_mv_dos, (943, posicion_plataforma_mv_dos))
+        if posicion_plataforma_mv_uno <= 530 and tope_uno_lvl_tres == False:
+            posicion_plataforma_mv_uno += 5
+            if posicion_plataforma_mv_uno >= 530:
+                tope_uno_lvl_tres = True
+        if posicion_plataforma_mv_uno >= 239 and tope_uno_lvl_tres == True:
+            posicion_plataforma_mv_uno -= 5
+            if posicion_plataforma_mv_uno <= 239:
+                tope_uno_lvl_tres = False
+        if posicion_plataforma_mv_dos >= 239 and tope_dos_lvl_tres == True:
+            posicion_plataforma_mv_dos -= 5
+            if posicion_plataforma_mv_dos <= 239:
+                tope_dos_lvl_tres = False
+        if posicion_plataforma_mv_dos <= 530 and tope_dos_lvl_tres == False:
+            posicion_plataforma_mv_dos += 5
+            if posicion_plataforma_mv_dos >= 530:
+                tope_dos_lvl_tres = True
+
+        lvl_tres_rect_plataforma_mv_uno.y = posicion_plataforma_mv_uno
+        lvl_tres_rect_plataforma_mv_dos.y = posicion_plataforma_mv_dos
+#########################################################################################
+        for proyectil in lista_disparo:
+            pygame.draw.rect(ventana, proyectil["color"], proyectil["rect"])
+        for proyectil in lista_disparo_enemigo:
+            pygame.draw.rect(ventana, proyectil["color"], proyectil["rect"])
+        for proyectil in lista_disparo_jefe:
+            pygame.draw.rect(ventana, proyectil["color"], proyectil["rect"])
+        # pygame.draw.rect(ventana, ROJO, crear_limite_visibilidad_der_jefe(jefe.rect), 1)
+        # pygame.draw.rect(ventana, ROJO, crear_limite_visibilidad_izq_jefe(jefe.rect), 1)
+
+        
+        sprites_lvl_tres.draw(ventana)
+        sprites_lvl_tres.update()
+        jugador.detectar_plataforma(plataformas_nivel_tres)
+
+
+        # for plataforma in plataformas_nivel_tres:
+        #     pygame.draw.rect(ventana, ROJO, plataforma, 1)
+       
+        
+        ventana.blit(texto_puntos, rect_puntos)
+        ventana.blit(texto_vidas, rect_vidas)
+        ventana.blit(texto_municion, rect_municion)
+        ventana.blit(texto_tiempo, rect_tiempo)
+        ventana.blit(texto_vida_jefe, rect_vida_jefe)
+        ventana.blit(nombre_jefe, rect_nombre_jefe)
+
+
+        # pygame.draw.rect(ventana, ROJO, crear_limite_jefe(jefe.rect), 5)
+        # for plataformas in plataformas_nivel_tres:
+        #     pygame.draw.rect(ventana, ROJO, plataformas, 5)
+        # a# pygame.draw.rect(ventana, ROJO, crear_nucleo(jefe.rect), 1)
+
+        
+        if tiempo_partida == 0 or jugador.vida <= 0:
+            nivel_tres = False
+            lvl_tres_ambiente.stop()
+            for calavera in puntos_lvl_tres:
+                if calavera["obtenido"]:
+                    calavera["punto"].rect.x -=2000
+                    calavera["obtenido"] = False
+
+        pygame.display.flip()
+    
+
+pygame.quit()
