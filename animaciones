@@ -1,0 +1,116 @@
+import pygame
+from config import*
+
+#FRAMES Y ACCIONES
+
+def get_animations_player():
+    acciones = [pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Reposo\personaje principal - idle1.png"), ESCALA), #0
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Reposo\personaje principal - idle2.png"), ESCALA), #1
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Reposo\personaje principal - idle1.png"), ESCALA), True, False), #2
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Reposo\personaje principal - idle2.png"), ESCALA), True, False), #3
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Correr\personaje principal - run1.png"), ESCALA), #4
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Correr\personaje principal - run2.png"), ESCALA), #5
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Correr\personaje principal - run3.png"), ESCALA), #6
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Correr\personaje principal - run4.png"), ESCALA), #7
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Correr\personaje principal - run1.png"), ESCALA), True, False), #8
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Correr\personaje principal - run2.png"), ESCALA), True, False), #9
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Correr\personaje principal - run3.png"), ESCALA), True, False), #10 
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Correr\personaje principal - run4.png"), ESCALA), True, False), #11
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Salto\personaje principal - jump.png"), ESCALA), #12
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Salto\personaje principal - jump.png"), ESCALA), True, False), #13
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Caida\personaje principal - fall.png"), ESCALA),  #14
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Caida\personaje principal - fall.png"), ESCALA), True, False), #15
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Ataque cuerpo a cuerpo\personaje principal - body attack1.png"), ESCALA), #16
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Ataque cuerpo a cuerpo\personaje principal - body attack2.png"), ESCALA), #17
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Ataque cuerpo a cuerpo\personaje principal - body attack3.png"), ESCALA), #18
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Ataque cuerpo a cuerpo\personaje principal - body attack4.png"), ESCALA), #19
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Ataque cuerpo a cuerpo\personaje principal - body attack1.png"), ESCALA), True, False), #20
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Ataque cuerpo a cuerpo\personaje principal - body attack2.png"), ESCALA), True, False), #21 
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Ataque cuerpo a cuerpo\personaje principal - body attack3.png"), ESCALA), True, False), #22
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Ataque cuerpo a cuerpo\personaje principal - body attack4.png"), ESCALA), True, False), #23
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Disparo\personaje principal - gun shot1.png"), ESCALA), #24
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Disparo\personaje principal - gun shot2.png"), ESCALA), #25
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Disparo\personaje principal - gun shot3.png"), ESCALA), #26
+                pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Disparo\personaje principal - gun shot4.png"), ESCALA), #27
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Disparo\personaje principal - gun shot1.png"), ESCALA), True, False), #28
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Disparo\personaje principal - gun shot2.png"), ESCALA), True, False), #29
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Disparo\personaje principal - gun shot3.png"), ESCALA), True, False), #30
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Jugador\Disparo\personaje principal - gun shot4.png"), ESCALA), True, False)] #31
+    return acciones        
+
+def get_animations_enemy():
+    acciones = [pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo - walk1.png"), ESCALA), #0
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo - walk2.png"), ESCALA), #1
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo - walk1.png"), ESCALA), True, False), #2
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo - walk2.png"), ESCALA), True, False), #3
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo - run1.png"), ESCALA), #4
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo - run2.png"), ESCALA), #5
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo - run3.png"), ESCALA), #6
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo - run4.png"), ESCALA), #7
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo - run1.png"), ESCALA), True, False), #8
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo - run2.png"), ESCALA), True, False), #9
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo - run3.png"), ESCALA), True, False), #10
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo - run4.png"), ESCALA), True, False), #11
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Muerto\enemigo - dead.png"), ESCALA), #12
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Muerto\enemigo - dead.png"), ESCALA), True, False)] #13
+    return acciones
+
+def get_animations_enemy_blind():
+    acciones = [pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo ciego - walk1.png"), ESCALA), #0
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo ciego - walk2.png"), ESCALA), #1
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo ciego - walk3.png"), ESCALA), #2
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo ciego - walk4.png"), ESCALA), #3
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo ciego - walk1.png"), ESCALA), True, False), #4
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo ciego - walk2.png"), ESCALA), True, False), #5
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo ciego - walk3.png"), ESCALA), True, False), #6
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\enemigo ciego - walk4.png"), ESCALA), True, False), #7 
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo ciego - attack1.png"), ESCALA), #8
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo ciego - attack2.png"), ESCALA), #9
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo ciego - attack3.png"), ESCALA), #10
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo ciego - attack1.png"), ESCALA), True, False), #11
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo ciego - attack2.png"), ESCALA), True, False), #12
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\enemigo ciego - attack3.png"), ESCALA), True, False), #13
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Muerto\enemigo ciego - dead.png"), ESCALA), #14
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Muerto\enemigo ciego - dead.png"), ESCALA), True, False)] #15
+    return acciones
+
+def get_animations_object():
+    animaciones = [pygame.transform.scale(pygame.image.load(r"Recursos\Objetos\puntos1.png"), (40, 40)), #0
+                   pygame.transform.scale(pygame.image.load(r"Recursos\Objetos\puntos2.png"), (40, 40)), #1
+                   pygame.transform.scale(pygame.image.load(r"Recursos\Objetos\puntos3.png"), (40, 40)), #2
+                   pygame.transform.scale(pygame.image.load(r"Recursos\Objetos\puntos4.png"), (40, 40)), #3
+                   pygame.transform.scale(pygame.image.load(r"Recursos\Objetos\botiquin 1.png"), (40, 40)), #4
+                   pygame.transform.scale(pygame.image.load(r"Recursos\Objetos\botiquin 2.png"), (40, 40)), #5
+                   pygame.transform.scale(pygame.image.load(r"Recursos\Objetos\municion 1.png"), (40, 40)), #6
+                   pygame.transform.scale(pygame.image.load(r"Recursos\Objetos\municion 1.png"), (40, 40))] #7
+    return animaciones
+
+def get_animations_boss():
+    acciones = [pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\jefe - walk1.png"), (360, 120)), #0
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\jefe - walk2.png"), (360, 120)), #1
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\jefe - walk3.png"), (360, 120)), #2
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\jefe - walk4.png"), (360, 120)), #3
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\jefe - walk1.png"), (360, 120)), True, False), #4
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\jefe - walk2.png"), (360, 120)), True, False), #5
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\jefe - walk3.png"), (360, 120)), True, False), #6
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Camina\jefe - walk4.png"), (360, 120)), True, False), #7
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño1.png"), (360, 120)), #8 
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño2.png"), (360, 120)), #9
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño3.png"), (360, 120)), #10
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño4.png"), (360, 120)), #11
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño1.png"), (360, 120)), True, False), #12
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño2.png"), (360, 120)), True, False), #13
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño3.png"), (360, 120)), True, False), #14
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño4.png"), (360, 120)), True, False), #15
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño_2_1.png"), (360, 120)), #16
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño_2_2.png"), (360, 120)), #17
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño_2_3.png"), (360, 120)), #18
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño_2_4.png"), (360, 120)), #19
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño_2_1.png"), (360, 120)), True, False), #20
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño_2_2.png"), (360, 120)), True, False), #21
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño_2_3.png"), (360, 120)), True, False), #22
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Corre\jefe - daño_2_4.png"), (360, 120)), True, False), #23
+                pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Muerto\jefe - dead.png"), (360, 120)), #24
+                pygame.transform.flip(pygame.transform.scale(pygame.image.load(r"Recursos\Enemigo\Muerto\jefe - dead.png"), (360, 120)), True, False)] #25
+    return acciones
+
