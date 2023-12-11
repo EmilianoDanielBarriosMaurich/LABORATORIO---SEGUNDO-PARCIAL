@@ -1,0 +1,100 @@
+import pygame
+from config import*
+
+def crear_borde_inferior(rect_personaje):
+    return pygame.Rect(rect_personaje.centerx - 20, rect_personaje.bottom - 10, 40, 10)
+
+def crear_borde_superior(rect_personaje):
+    return pygame.Rect(rect_personaje.centerx - 20, rect_personaje.y - 10, 40, 20)
+
+def crear_borde_derecho(rect_personaje):
+    return pygame.Rect(rect_personaje.right - 20, rect_personaje.top + 10, 20, 40)
+
+def crear_borde_izquierdo(rect_personaje):
+    return pygame.Rect(rect_personaje.left, rect_personaje.top + 10 , 20, 40)
+
+def crear_nucleo(rect_personaje):
+    return pygame.Rect(rect_personaje.centerx - 20, rect_personaje.top , 40, rect_personaje.height)
+
+def mostrar_texto(superficie, texto, x, y, tamaño_fuente= 150, color=(0, 0, 0)):
+    fuente = pygame.font.SysFont("comicsans", tamaño_fuente)
+    render = fuente.render(texto, True, color) 
+    rect_texto = render.get_rect(center=(x, y))
+    superficie.blit(render, rect_texto)
+
+def crear_boton(superficie, rect, texto, tamaño_fuente, color_normal, color_hover):
+    posicion_mouse = pygame.mouse.get_pos()
+    if rect.collidepoint(posicion_mouse):
+        pygame.draw.rect(superficie, color_hover, rect, border_radius=10)
+    else:
+        pygame.draw.rect(superficie, color_normal, rect, border_radius=10)
+    mostrar_texto(superficie, texto, rect.centerx, rect.centery, tamaño_fuente)
+
+def terminar():
+    pygame.quit()
+    exit()
+
+def esperar_menu(rect_jugar, rect_salir, pantalla, fuente):
+    while True:
+        crear_boton(pantalla, rect_jugar, "JUGAR", fuente,  (0, 187, 0), (0, 255, 0))
+        crear_boton(pantalla, rect_salir, "SALIR", fuente, (136, 0, 21), (255, 0, 0))
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                cursor = event.pos
+                if rect_jugar.collidepoint(cursor[0], cursor[1]):
+                    return None
+                if rect_salir.collidepoint(cursor[0], cursor[1]):
+                    terminar()
+
+def crear_limite_visibilidad_der(rect_personaje):   
+    return pygame.Rect(rect_personaje.right, rect_personaje.top, 200, 60)
+
+def crear_limite_visibilidad_izq(rect_personaje):   
+    return pygame.Rect(rect_personaje.left - 200, rect_personaje.top, 200, 60)
+
+
+def crear_bloque(left=0, top=0, ancho=50, alto=50, color=(255, 255, 255), velocidad_x = 5):
+    rec = pygame.Rect(left, top, ancho, alto)
+    return {"rect": rec, "color": color, "velocidad_x": velocidad_x}
+
+def crear_limite_jefe_der(rectangulo):
+    return pygame.Rect(rectangulo.centerx + 30, rectangulo.top + 10, 20, 100)
+
+def crear_limite_jefe_izq(rectangulo):
+    return pygame.Rect(rectangulo.centerx - 50, rectangulo.top + 10, 20, 100)
+
+def crear_limite_no_visibilidad_der(rect_personaje):   
+    return pygame.Rect(rect_personaje.right + 300, rect_personaje.centery - ALTO, 25, ALTO*2)
+
+def crear_limite_no_visibilidad_izq(rect_personaje):   
+    return pygame.Rect(rect_personaje.left - 325, rect_personaje.centery - ALTO, 25, ALTO*2)
+
+def crear_limite_visibilidad_der_jefe(rect_personaje):   
+    return pygame.Rect(rect_personaje.centerx + 50, rect_personaje.top, 300, 120)
+
+def crear_limite_visibilidad_izq_jefe(rect_personaje):   
+    return pygame.Rect(rect_personaje.centerx - 350, rect_personaje.top, 300, 120)
+
+
+def elegir_nivel(rect_nivel_uno, rect_nivel_dos, rect_nivel_tres, pantalla, fuente):
+    elegir = True
+    while elegir:
+        crear_boton(pantalla, rect_nivel_uno, "NIVEL 1", fuente,  AZUL, BLANCO)
+        crear_boton(pantalla, rect_nivel_dos, "NIVEL 2", fuente, AZUL, BLANCO)
+        crear_boton(pantalla, rect_nivel_tres, "NIVEL 3", fuente, AZUL, BLANCO)
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    elegir = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                cursor = event.pos
+                if rect_nivel_uno.collidepoint(cursor[0], cursor[1]):
+                    return 1
+                if rect_nivel_dos.collidepoint(cursor[0], cursor[1]):
+                    return 2
+                if rect_nivel_tres.collidepoint(cursor[0], cursor[1]):
+                    return 3
+        
+        
